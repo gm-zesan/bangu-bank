@@ -1,46 +1,31 @@
 <?php
-    session_start();
-    require 'helpers.php';
     require_once __DIR__ . '/../vendor/autoload.php';
     use App\classes\User;
+    use App\classes\Helpers;
+
+    $helpers = new Helpers();
 
     $errors = [];
-    $name = '';
-    $email = '';
-    $password = '';
     if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-        if (empty($_POST['name'])) {
-            $errors['name'] = 'Please provide a name';
-        } else {
-            $name = sanitize($_POST['name']);
-        }
-    
-        if (empty($_POST['email'])) {
-            $errors['email'] = 'Please provide an email address';
-        } else {
-            $email = sanitize($_POST['email']);
-            if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-                $errors['email'] = 'Please provide a valid email address';
-            }
-        }
-
-        if (empty($_POST['password'])) {
-            $errors['password'] = 'Please provide a password';
-        } else {
-            $password = sanitize($_POST['password']);
-        }
-        if (empty($errors)) {
-            $user = new User();
-            $reg = $user->register($name, $email, $password);
-            foreach ($reg as $key => $value) {
-                if($key === 'success'){
-                    flash($key, $value);
-                    header('Location: login.php');
-                    exit();
+        $user = new User();
+        $reg = $user->register($_POST['name'], $_POST['email'], $_POST['password']);
+        if($reg){
+            foreach ($reg as $key => $data) {
+                if (is_array($data)) {
+                    foreach ($data as $key => $value) {
+                        if ($key === 'error') {
+                            $errors[$data['field']] = $value;
+                        }
+                    }
                 }
-                flash($key, $value);
             }
-            
+            if (empty($errors)) {
+                $helpers->flash('success', 'Registration successful');
+                header('Location: login.php');
+                exit();
+            } 
+        }else{
+            $errors['auth_error'] = 'Email already exists';
         }
     }
 ?>
@@ -92,19 +77,13 @@
         <div class="mt-10 sm:mx-auto sm:w-full sm:max-w-[480px]">
             <div class="px-6 pt-6 pb-12 bg-white shadow sm:rounded-lg sm:px-12">
             <?php
-                $errorMessage = flash('error');
-                $successMessage = flash('success');
+                $successMessage = $helpers->flash('success');
                 if ($successMessage) : ?>
                     <div class="mt-2 mb-4 bg-teal-100 border border-teal-200 text-sm text-center text-teal-800 rounded-lg p-4" role="alert">
                         <span class="font-bold"><?= $successMessage; ?></span>
                     </div>
-            <?php endif; if ($errorMessage) :  ?>
-                <div class="mt-2 mb-4 bg-red-100 border border-red-200 text-sm text-center text-red-800 rounded-lg p-4" role="alert">
-                        <span class="font-bold"><?= $errorMessage; ?></span>
-                    </div>
-            <?php endif; ?>
-                <?php if (isset($errors['auth_error'])) : ?>
-                    <p class="text-xs text-red-600 mt-2 mb-6 text-center"><?= $errors['auth_error']; ?></p>
+                <?php endif; if (isset($errors['auth_error'])): ?>
+                    <p class="text-xs text-red-600 mt-2 mb-4 text-center"><?= $errors['auth_error']; ?></p>
                 <?php endif; ?>
                 <form
                     class="space-y-6"

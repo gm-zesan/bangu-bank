@@ -10,7 +10,14 @@
         "name": "zesan",
         "email": "zesan@gmail.com",
         "password": "$2y$10$5H.atRNzl2etQyG5aYJPdOiprjBrgaFrVECSssmbZy9xclzcJQCW2",
-        "balance": 0,
+        "balance": 100,
+        "isAdmin": false
+    },
+    {
+        "name": "admin",
+        "email": "admin@gmail.com",
+        "password": "$2y$10$DJyuzSceWapEWjS1oqp4sOWv9wuVL62Wo9K45avtgVR.wujMRVWB.",
+        "balance": 11600,
         "isAdmin": false
     }
 ]
