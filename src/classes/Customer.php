@@ -12,7 +12,7 @@
             if($this->validate('email', $toEmail) === false){
                 $this->errors[] = array('error' => 'Recipient email is required', 'field' => 'email');
             }
-            // $this->dd($this->errors);
+
             if(!empty($this->errors)){
                 return $this->errors;
             }
@@ -38,6 +38,9 @@
             }
 
             $this->fileStorage->save(__DIR__ . '../../data/users.json', $users);
+            $this->logTransaction($fromEmail, 'transfer', $amount, $toEmail);
+            $this->logTransaction($toEmail, 'received', $amount, $fromEmail);
+
             return true;
         }
     }

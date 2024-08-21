@@ -1,0 +1,29 @@
+[
+    {
+        "email": "zesan@gmail.com",
+        "type": "received",
+        "amount": 100,
+        "date": "2021-08-01T00:00:00.000Z",
+        "recipient": "admin@gmail.com"
+    },
+    {
+        "email": "admin@gmail.com",
+        "type": "deposit",
+        "amount": 100000,
+        "date": "2021-08-01T00:00:00.000Z"
+    },
+    {
+        "email": "admin@gmail.com",
+        "type": "withdraw",
+        "amount": 1000,
+        "date": "2021-08-01T00:00:00.000Z"
+    },
+    {
+        "email": "admin@gmail.com",
+        "type": "transfer",
+        "amount": 100,
+        "date": "2021-08-01T00:00:00.000Z",
+        "recipient": "zesan@gmail.com"
+    }
+]
+  

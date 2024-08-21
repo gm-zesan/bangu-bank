@@ -27,4 +27,19 @@ class Helpers{
             return $message;
         }
     }
+
+
+    function logTransaction($email, $type, $amount, $recipient = null) {
+        $file = '../../data/transactions.json';
+        $transactions = file_exists($file) ? json_decode(file_get_contents($file), true) : [];
+        $transactions[] = [
+            'email' => $email,
+            'type' => $type,
+            'amount' => $amount,
+            'date' => date('d M Y, H:i:s'),
+            'recipient' => $recipient
+        ];
+        file_put_contents($file, json_encode($transactions, JSON_PRETTY_PRINT));
+    }
+
 }

@@ -5,9 +5,7 @@
     class FileStorage
     {
         protected $filePath;
-        public function __construct() {
-            $this->filePath = __DIR__ . '../../data/users.json';
-        }
+
         public function load($file){
             if (!file_exists($file)) {
                 return [];
@@ -20,7 +18,7 @@
         }
 
         public function getUserByEmail($email) {
-            $users = json_decode(file_get_contents($this->filePath), true);
+            $users = $this->load(__DIR__ . '../../data/users.json');
             foreach ($users as $user) {
                 if ($user['email'] === $email) {
                     return $user;

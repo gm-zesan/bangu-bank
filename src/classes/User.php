@@ -68,6 +68,28 @@
             return false;
         }
 
+        function getUserNameByEmail($email) {
+            if($email){
+                $userData = $this->fileStorage->getUserByEmail($email);
+                if($userData){
+                    return $userData['name'];
+                }
+            }
+            return 'Unknown';
+        }
+
+
+        public function getBalance($email){
+            if ($email) {
+                $userData = $this->fileStorage->getUserByEmail($email);
+                if ($userData) {
+                    $this->balance = $userData['balance'];
+                }
+            }
+            return $this->balance;
+        }
+
+        
         public function getInitials($fullName) {
             $nameParts = explode(' ', $fullName);
             if (count($nameParts) > 1) {
@@ -81,16 +103,6 @@
             }
         }
 
-        public function getBalance($email){
-            if ($email) {
-                $userData = $this->fileStorage->getUserByEmail($email);
-                if ($userData) {
-                    $this->balance = $userData['balance'];
-                }
-            }
-            return $this->balance;
-        }
-
         public function deposit($amount, $email){
             if($this->validate('amount', $amount) === false){
                 return false;
@@ -100,6 +112,7 @@
             }
             $this->balance += $amount;
             $this->updateUserBalance($this->balance, $email);
+            $this->logTransaction($email, 'deposit', $amount);
             return true;
         }
 
@@ -112,6 +125,7 @@
             }
             $this->balance -= $amount;
             $this->updateUserBalance($this->balance, $email);
+            $this->logTransaction($email, 'withdraw', $amount);
             return true;
         }
 
