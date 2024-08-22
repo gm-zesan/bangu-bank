@@ -10,7 +10,7 @@
 
     if($session->get('user')){
         if($session->get('isAdmin')){
-            header('Location: ./admin/dashboard.php');
+            header('Location: ./admin/customers.php');
             exit();
         }
         header('Location: ./customer/dashboard.php');
@@ -37,7 +37,7 @@
                 $session->set('isAdmin', $login['isAdmin']);
                 $helpers->flash('success', 'Login successful');
                 if ($login['isAdmin']) {
-                    header('Location: ./admin/dashboard.php');
+                    header('Location: ./admin/customers.php');
                 } else {
                     header('Location: ./customer/dashboard.php');
                 }

@@ -1,18 +1,23 @@
 <?php
     namespace APP\classes;
     use App\classes\FileStorage;
+    use App\classes\Transaction;
     use App\classes\Helpers as ClassesHelpers;
     use App\classes\ValidateTrait;
+
+
     class User extends ClassesHelpers {
         use ValidateTrait;
 
         protected $email;
         protected $balance;
         protected $fileStorage;
+        protected $transaction;
         protected $errors = array();
 
         public function __construct() {
             $this->fileStorage = new FileStorage();
+            $this->transaction = new Transaction();
         }
         
         public function register($name, $email, $password){
@@ -68,7 +73,12 @@
             return false;
         }
 
-        function getUserNameByEmail($email) {
+        public function getAllUsers(){
+            $users = $this->fileStorage->load(__DIR__ . '../../data/users.json');
+            return $users;
+        }
+
+        public function getUserNameByEmail($email) {
             if($email){
                 $userData = $this->fileStorage->getUserByEmail($email);
                 if($userData){
@@ -79,15 +89,6 @@
         }
 
 
-        public function getBalance($email){
-            if ($email) {
-                $userData = $this->fileStorage->getUserByEmail($email);
-                if ($userData) {
-                    $this->balance = $userData['balance'];
-                }
-            }
-            return $this->balance;
-        }
 
         
         public function getInitials($fullName) {
@@ -103,6 +104,17 @@
             }
         }
 
+        
+        public function getBalance($email){
+            if ($email) {
+                $userData = $this->fileStorage->getUserByEmail($email);
+                if ($userData) {
+                    $this->balance = $userData['balance'];
+                }
+            }
+            return $this->balance;
+        }
+
         public function deposit($amount, $email){
             if($this->validate('amount', $amount) === false){
                 return false;
@@ -112,7 +124,7 @@
             }
             $this->balance += $amount;
             $this->updateUserBalance($this->balance, $email);
-            $this->logTransaction($email, 'deposit', $amount);
+            $this->transaction->logTransaction($email, 'deposit', $amount);
             return true;
         }
 
@@ -125,25 +137,11 @@
             }
             $this->balance -= $amount;
             $this->updateUserBalance($this->balance, $email);
-            $this->logTransaction($email, 'withdraw', $amount);
+            $this->transaction->logTransaction($email, 'withdraw', $amount);
             return true;
         }
 
-        private function validate($name, $data){
-            if($name === 'name' && !empty($data)){
-                return $this->sanitize($data);
-            }
-            if($name === 'email' && !empty($data)){
-                return filter_var($this->sanitize($data), FILTER_VALIDATE_EMAIL);
-            }
-            if($name === 'password' && !empty($data)){
-                return $this->sanitize($data);
-            }
-            if($name === 'amount' && !empty($data)){
-                return (float) $this->sanitize($data);
-            }
-            return false;
-        }
+        
         private function updateUserBalance($balance, $email){
             $users = $this->fileStorage->load(__DIR__ . '../../data/users.json');
             foreach ($users as $index => $user) {

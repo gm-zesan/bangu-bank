@@ -1,34 +1,80 @@
 <?php
-    namespace App\classes;
-
+    namespace APP\classes;
+    use App\classes\FileStorage;
+    use App\classes\ValidateTrait;
     class Transaction{
-        protected $from;
-        protected $to;
-        protected $amount;
-        protected $type;
-        protected $date;
+        use ValidateTrait;
+        
         protected $fileStorage;
+        protected $errors = array();
 
-        public function __construct($from, $to, $amount, $type)
+        public function __construct()
         {
-            $this->from = $from;
-            $this->to = $to;
-            $this->amount = $amount;
-            $this->type = $type;
-            $this->date = date('Y-m-d H:i:s');
             $this->fileStorage = new FileStorage();
         }
 
-        public function recordTransaction()
-        {
-            $transactions = $this->fileStorage->load('data/transactions.json');
+        public function transfer($amount, $fromEmail, $toEmail){
+            $this->errors = [];
+            if($this->validate('amount', $amount) === false){
+                $this->errors[] = array('error' => 'Amount is required', 'field' => 'amount');
+            }
+            if($this->validate('email', $toEmail) === false){
+                $this->errors[] = array('error' => 'Recipient email is required', 'field' => 'email');
+            }
+
+            if(!empty($this->errors)){
+                return $this->errors;
+            }
+
+            $users = $this->fileStorage->load(__DIR__ . '../../data/users.json');
+            $recipientFound = false;
+
+            foreach ($users as $key => $user) {
+                if ($user['email'] === $fromEmail) {
+                    if ($user['balance'] < $amount) {
+                        return false;
+                    }
+                    $users[$key]['balance'] -= $amount;
+                }
+                if($user['email'] === $toEmail){
+                    $users[$key]['balance'] += $amount;
+                    $recipientFound = true;
+                }
+            }
+
+            if (!$recipientFound) {
+                return false;
+            }
+
+            $this->fileStorage->save(__DIR__ . '../../data/users.json', $users);
+            $this->logTransaction($fromEmail, 'transfer', $amount, $toEmail);
+            $this->logTransaction($toEmail, 'received', $amount, $fromEmail);
+
+            return true;
+        }
+
+        function logTransaction($email, $type, $amount, $recipient = null) {
+            $file = '../../data/transactions.json';
+            $transactions = file_exists($file) ? json_decode(file_get_contents($file), true) : [];
             $transactions[] = [
-                'from' => $this->from,
-                'to' => $this->to,
-                'amount' => $this->amount,
-                'type' => $this->type,
-                'date' => $this->date
+                'email' => $email,
+                'type' => $type,
+                'amount' => $amount,
+                'date' => date('d M Y, H:i:s'),
+                'recipient' => $recipient
             ];
-            $this->fileStorage->save('data/transactions.json', $transactions);
+            file_put_contents($file, json_encode($transactions, JSON_PRETTY_PRINT));
+        }
+
+        public function getTransactionByUser($email)
+        {
+            $transactions = $this->fileStorage->load(__DIR__ . '../../data/transactions.json');
+            $userTransactions = [];
+            foreach($transactions as $transaction){
+                if($transaction['email'] === $email || (isset($transaction['recipient']) && $transaction['recipient'] === $email)){
+                    $userTransactions[] = $transaction;
+                }
+            }
+            return $userTransactions;
         }
     }

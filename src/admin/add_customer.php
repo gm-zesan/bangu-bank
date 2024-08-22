@@ -1,3 +1,41 @@
+<?php
+    require_once __DIR__ . '/../../vendor/autoload.php';
+    use App\classes\User;
+    use App\classes\Session;
+    
+    $user = new User();
+    $session = new Session();
+    $session->start();
+
+    if(!$session->get('user') && !$session->get('isAdmin')) {
+        header('Location: ../login.php');
+        exit();
+    }
+
+    $errors = [];
+    if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+        $reg = $user->register($_POST['name'], $_POST['email'], $_POST['password']);
+        if($reg){
+            foreach ($reg as $key => $data) {
+                if (is_array($data)) {
+                    foreach ($data as $key => $value) {
+                        if ($key === 'error') {
+                            $errors[$data['field']] = $value;
+                        }
+                    }
+                }
+            }
+            if (empty($errors)) {
+                $user->flash('success', 'Customer create successful');
+                header('Location: ./add_customer.php');
+                exit();
+            } 
+        }else{
+            $errors['auth_error'] = 'Email already exists';
+        }
+    }
+?>
+
 <!DOCTYPE html>
 <html
   class="h-full bg-gray-100"
@@ -100,7 +138,7 @@
                     aria-labelledby="user-menu-button"
                     tabindex="-1">
                     <a
-                      href="#"
+                      href="../logout.php"
                       class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
                       role="menuitem"
                       tabindex="-1"
@@ -213,7 +251,7 @@
               </div>
               <div class="px-2 mt-3 space-y-1">
                 <a
-                  href="#"
+                  href="../logout.php"
                   class="block px-3 py-2 text-base font-medium text-white rounded-md hover:bg-sky-500 hover:bg-opacity-75"
                   >Sign out</a
                 >
@@ -233,42 +271,40 @@
 
       <main class="-mt-32">
         <div class="px-4 pb-12 mx-auto max-w-7xl sm:px-6 lg:px-8">
-          <div class="bg-white rounded-lg">
-            <form
+        
+        
+          <div class="bg-white rounded-lg p-6">
+
+          <?php
+            $successMessage = $user->flash('success');
+            if ($successMessage) : ?>
+                <div class="mt-2 mb-4 bg-teal-100 border border-teal-200 text-sm text-center text-teal-800 rounded-lg p-4" role="alert">
+                    <span class="font-bold"><?= $successMessage; ?></span>
+                </div>
+            <?php endif; if (isset($errors['auth_error'])): ?>
+                <p class="text-xs text-red-600 mt-2 mb-4 text-center"><?= $errors['auth_error']; ?></p>
+            <?php endif; ?>
+            <form action="add_customer.php"
+                    method="POST"
               class="bg-white shadow-sm ring-1 ring-gray-900/5 sm:rounded-xl md:col-span-2">
               <div class="px-4 py-6 sm:p-8">
                 <div class="grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-6">
-                  <div class="sm:col-span-3">
+                  <div class="sm:col-span-6">
                     <label
-                      for="first-name"
+                      for="name"
                       class="block text-sm font-medium leading-6 text-gray-900"
-                      >First Name</label
+                      >Full Name</label
                     >
                     <div class="mt-2">
                       <input
                         type="text"
-                        name="first-name"
-                        id="first-name"
+                        name="name"
+                        id="name"
                         autocomplete="given-name"
-                        required
                         class="block w-full p-2 text-gray-900 border-0 rounded-md shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-sky-600 sm:text-sm sm:leading-6" />
-                    </div>
-                  </div>
-
-                  <div class="sm:col-span-3">
-                    <label
-                      for="last-name"
-                      class="block text-sm font-medium leading-6 text-gray-900"
-                      >Last Name</label
-                    >
-                    <div class="mt-2">
-                      <input
-                        type="text"
-                        name="last-name"
-                        id="last-name"
-                        autocomplete="family-name"
-                        required
-                        class="block w-full p-2 text-gray-900 border-0 rounded-md shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-sky-600 sm:text-sm sm:leading-6" />
+                        <?php if (isset($errors['name'])) : ?>
+                                <p class="text-xs text-red-600 mt-2"><?= $errors['name']; ?></p>
+                            <?php endif; ?>
                     </div>
                   </div>
 
@@ -284,8 +320,10 @@
                         name="email"
                         id="email"
                         autocomplete="email"
-                        required
                         class="block w-full p-2 text-gray-900 border-0 rounded-md shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-sky-600 sm:text-sm sm:leading-6" />
+                        <?php if (isset($errors['email'])) : ?>
+                                <p class="text-xs text-red-600 mt-2"><?= $errors['email']; ?></p>
+                            <?php endif; ?>
                     </div>
                   </div>
 
@@ -301,8 +339,10 @@
                         name="password"
                         id="password"
                         autocomplete="password"
-                        required
                         class="block w-full p-2 text-gray-900 border-0 rounded-md shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-sky-600 sm:text-sm sm:leading-6" />
+                        <?php if (isset($errors['password'])) : ?>
+                            <p class="text-xs text-red-600 mt-2"><?= $errors['password']; ?></p>
+                        <?php endif; ?>
                     </div>
                   </div>
                 </div>

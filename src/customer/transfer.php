@@ -1,14 +1,12 @@
 <?php
-
-
     ob_start();
     include('includes/header.php');
-    use App\classes\Customer;
-    $customer = new Customer();
+    use App\classes\Transaction;
+    $transaction = new Transaction();
     
     $errors = [];
     if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-        $transfer = $customer->transfer($_POST['amount'], $session->get('user'), $_POST['email']);
+        $transfer = $transaction->transfer($_POST['amount'], $session->get('user'), $_POST['email']);
         
         if ($transfer) {
             if(is_array($transfer)){

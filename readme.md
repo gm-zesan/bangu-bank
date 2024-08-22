@@ -19,6 +19,20 @@ BanguBank is a simple banking application with features for both 'Admin' and 'Cu
 - Transfer money to another customer's account by specifying their email address.
 - See the current balance of their account.
 
+
+### Admin Credentials
+
+- email
+```bash
+admin@gmail.com
+```
+- password
+```bash
+1234
+```
+
+
+
 ## Installation
 
 Clone the repository to your local machine:

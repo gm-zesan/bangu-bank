@@ -1,3 +1,20 @@
+<?php
+    require_once __DIR__ . '/../../vendor/autoload.php';
+    use App\classes\FileStorage;
+    use App\classes\User;
+    use App\classes\Session;
+    
+    $user = new User();
+    $file = new FileStorage();
+    $session = new Session();
+    $session->start();
+
+    if(!$session->get('user') && !$session->get('isAdmin')) {
+        header('Location: ../login.php');
+        exit();
+    }
+    $transactions = $file->load(__DIR__ . '/../data/transactions.json');
+?>
 <!DOCTYPE html>
 <html
   class="h-full bg-gray-100"
@@ -100,7 +117,7 @@
                     aria-labelledby="user-menu-button"
                     tabindex="-1">
                     <a
-                      href="#"
+                      href="../logout.php"
                       class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
                       role="menuitem"
                       tabindex="-1"
@@ -213,7 +230,7 @@
               </div>
               <div class="mt-3 space-y-1 px-2">
                 <a
-                  href="#"
+                  href="../logout.php"
                   class="block rounded-md px-3 py-2 text-base font-medium text-white hover:bg-sky-500 hover:bg-opacity-75"
                   >Sign out</a
                 >
@@ -267,78 +284,24 @@
                         </tr>
                       </thead>
                       <tbody class="divide-y divide-gray-200 bg-white">
-                        <tr>
-                          <td
-                            class="whitespace-nowrap py-4 pl-4 pr-3 text-sm text-gray-800 sm:pl-0">
-                            Bruce Wayne
-                          </td>
-                          <td
-                            class="whitespace-nowrap px-2 py-4 text-sm font-medium text-emerald-600">
-                            +$10,240
-                          </td>
-                          <td
-                            class="whitespace-nowrap px-2 py-4 text-sm text-gray-500">
-                            29 Sep 2023, 09:25 AM
-                          </td>
-                        </tr>
-                        <tr>
-                          <td
-                            class="whitespace-nowrap py-4 pl-4 pr-3 text-sm text-gray-800 sm:pl-0">
-                            Al Nahian
-                          </td>
-                          <td
-                            class="whitespace-nowrap px-2 py-4 text-sm font-medium text-red-600">
-                            -$2,500
-                          </td>
-                          <td
-                            class="whitespace-nowrap px-2 py-4 text-sm text-gray-500">
-                            15 Sep 2023, 06:14 PM
-                          </td>
-                        </tr>
-                        <tr>
-                          <td
-                            class="whitespace-nowrap py-4 pl-4 pr-3 text-sm text-gray-800 sm:pl-0">
-                            Muhammad Alp Arslan
-                          </td>
-                          <td
-                            class="whitespace-nowrap px-2 py-4 text-sm font-medium text-emerald-600">
-                            +$49,556
-                          </td>
-                          <td
-                            class="whitespace-nowrap px-2 py-4 text-sm text-gray-500">
-                            03 Jul 2023, 12:55 AM
-                          </td>
-                        </tr>
 
+                        <?php foreach ($transactions as $transaction): ?>
                         <tr>
                           <td
                             class="whitespace-nowrap py-4 pl-4 pr-3 text-sm text-gray-800 sm:pl-0">
-                            Povilas Korop
+                            <?= htmlspecialchars($user->getUserNameByEmail($transaction['email'])) ?>
                           </td>
                           <td
-                            class="whitespace-nowrap px-2 py-4 text-sm font-medium text-emerald-600">
-                            +$6,125
+                            class="whitespace-nowrap px-2 py-4 text-sm font-medium <?= $transaction['type'] === 'deposit' ? 'text-emerald-600' : 'text-red-600'; ?>">
+                            <?= $transaction['type'] === 'deposit' ? '+$' : '-$'; ?><?= number_format($transaction['amount'], 2); ?>
                           </td>
                           <td
                             class="whitespace-nowrap px-2 py-4 text-sm text-gray-500">
-                            07 Jun 2023, 10:00 PM
+                            <?= date('d M Y, h:i A', strtotime($transaction['date'])) ?>
                           </td>
                         </tr>
+                        <?php endforeach; ?>
 
-                        <tr>
-                          <td
-                            class="whitespace-nowrap py-4 pl-4 pr-3 text-sm text-gray-800 sm:pl-0">
-                            Martin Joo
-                          </td>
-                          <td
-                            class="whitespace-nowrap px-2 py-4 text-sm font-medium text-red-600">
-                            -$125
-                          </td>
-                          <td
-                            class="whitespace-nowrap px-2 py-4 text-sm text-gray-500">
-                            02 Feb 2023, 8:30 PM
-                          </td>
-                        </tr>
                       </tbody>
                     </table>
                   </div>

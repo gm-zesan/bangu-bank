@@ -1,23 +1,37 @@
 [
     {
-        "name": "hasan",
-        "email": "hasan@gmail.com",
-        "password": "$2y$10$U.RcWEgyCdRFz0X2O1vMK.ZeeEdH.4CGy\/Lbzw1VQ6oJ1UdUoMXhy",
-        "balance": 0,
-        "isAdmin": false
-    },
-    {
-        "name": "zesan",
-        "email": "zesan@gmail.com",
-        "password": "$2y$10$5H.atRNzl2etQyG5aYJPdOiprjBrgaFrVECSssmbZy9xclzcJQCW2",
-        "balance": 100,
-        "isAdmin": false
-    },
-    {
         "name": "admin",
         "email": "admin@gmail.com",
         "password": "$2y$10$DJyuzSceWapEWjS1oqp4sOWv9wuVL62Wo9K45avtgVR.wujMRVWB.",
         "balance": 11600,
+        "isAdmin": true
+    },
+    {
+        "name": "zesan",
+        "email": "zesan@gmail.com",
+        "password": "$2y$10$ZW8Kw1gQVMc9wszbhl4vWeO1fnU\/15z2UPM6dqmZPxv0xdAhB.2qC",
+        "balance": 100,
+        "isAdmin": false
+    },
+    {
+        "name": "nahid hasan",
+        "email": "nahid@gmail.com",
+        "password": "$2y$10$JH.OofcZI8b8\/0F34KFrvu6eK6H.KrJEI\/BY8RIDeYHHW00rVKuRq",
+        "balance": 0,
+        "isAdmin": false
+    },
+    {
+        "name": "abid",
+        "email": "abid@gmail.com",
+        "password": "$2y$10$VoOak6KYEUIoZK1vVTuHpe2e0CSBlSyDLhT4yMldtc6J2XzJE\/mAC",
+        "balance": 0,
+        "isAdmin": false
+    },
+    {
+        "name": "jahid",
+        "email": "jahid@gmail.com",
+        "password": "$2y$10$UKdkPOm9.fN0.S3YUYhbfeEmWfxdpFh0wSkc1wZohFMdGE\/8V8YdW",
+        "balance": 0,
         "isAdmin": false
     }
 ]

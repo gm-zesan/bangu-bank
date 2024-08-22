@@ -86,10 +86,10 @@
                                         <?php foreach ($transactions as $transaction): ?>
                                             <tr>
                                                 <td class="whitespace-nowrap py-4 pl-4 pr-3 text-sm text-gray-800 sm:pl-0">
-                                                    <?= htmlspecialchars($user->getUserNameByEmail($transaction['email'])) ?>
+                                                    <?= in_array($transaction['type'], ['deposit', 'withdraw', 'received']) ? htmlspecialchars($user->getUserNameByEmail($transaction['email'])) : htmlspecialchars($user->getUserNameByEmail($transaction['recipient'])) ?>
                                                 </td>
                                                 <td class="whitespace-nowrap py-4 pl-4 pr-3 text-sm text-gray-500 sm:pl-0">
-                                                    <?= htmlspecialchars($transaction['email']) ?>
+                                                    <?= in_array($transaction['type'], ['deposit', 'withdraw', 'received']) ? $transaction['email'] : $transaction['recipient'] ?>
                                                 </td>
                                                 <td class="whitespace-nowrap px-2 py-4 text-sm font-medium text-<?= in_array($transaction['type'], ['deposit', 'received']) ? 'emerald' : 'red' ?>-600">
                                                     <?= in_array($transaction['type'], ['deposit', 'received']) ? '+' : '-' ?>
